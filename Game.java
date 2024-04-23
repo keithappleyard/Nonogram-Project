@@ -1,5 +1,5 @@
 public class Game {
     public static void main(String[] args){
-        Nonogram a = new Nonogram();
+        Nonogram a = new Nonogram(5,5);
     }
 }
