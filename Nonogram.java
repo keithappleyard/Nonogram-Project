@@ -36,6 +36,7 @@ public class Nonogram implements ActionListener{
 
     //called when a button is pressed
     public void actionPerformed(ActionEvent e){
-        
+        Square square = (Square)e.getSource();
+        square.cycleColor();
     }
 }
