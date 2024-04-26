@@ -5,7 +5,7 @@ import java.awt.*;
 public class Square extends JButton{
     private int xPos;
     private int yPos;
-    private Color[] colors = {Color.WHITE, Color.LIGHT_GRAY, Color.BLACK};
+    private Color[] colors = {Color.WHITE, Color.BLACK, Color.LIGHT_GRAY};
     private int currentColor = 0;
 
     public Square(int xPos, int yPos){
@@ -22,6 +22,7 @@ public class Square extends JButton{
         return yPos;
     }
 
+    //function to cycle between each color in the array of colors when a button is clicked
     public void cycleColor(){
         if(currentColor < colors.length - 1){
             currentColor++;
@@ -30,5 +31,10 @@ public class Square extends JButton{
             currentColor = 0;
         }
         setBackground(colors[currentColor]);
+    }
+
+    //function to return value corresponding to current colour of image
+    public int getCurrentColor(){
+        return currentColor;
     }
 }

@@ -51,15 +51,39 @@ public class Nonogram implements ActionListener{
             }
         }
 
+        //button to check puzzle
+        JButton checkButton = new JButton("Submit");
+        checkButton.addActionListener(e -> checkPuzzle());
+
         panel.add(rowNumbers, BorderLayout.WEST);
         panel.add(columnNumbers, BorderLayout.NORTH);
         panel.add(gridPanel, BorderLayout.CENTER);
+        panel.add(checkButton, BorderLayout.SOUTH);
         
         frame.add(panel);
         frame.setVisible(true);
         frame.setTitle("Nonogram");
         frame.setSize(600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    //check if colour of each square matches image
+    public boolean checkPuzzle(){
+        //compare number of rows and columns
+        if(squares.length != puzzleImage.length || squares[0].length != puzzleImage[0].length)
+            return false;
+
+        //compare each square and return false if any square does not match
+        for(int x = 0; x < rows; x++){
+            for(int y = 0; y < columns; y++){
+                if(puzzleImage[x][y] != squares[x][y].getCurrentColor())
+                    return false;
+            }
+        }
+
+        System.out.println("You won!");
+        //return true otherwise
+        return true;
     }
 
     //called when a button is pressed
