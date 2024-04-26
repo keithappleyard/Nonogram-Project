@@ -5,17 +5,41 @@ import java.awt.event.*;
 public class Nonogram implements ActionListener{
     int rows;
     int columns;
-    public Square[][] squares;
+    Square[][] squares;
+
+    //Hard coded image to solve
+    private int[][] puzzleImage = {
+        {0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0},
+        {0, 0, 0, 0, 0},
+        {0, 1, 0, 1, 0},
+        {0, 1, 1, 1, 0},
+    };
 
     public Nonogram(int rows, int columns){
         //initialise panels and frames
         this.rows = rows;
         this.columns = columns;
         JFrame frame = new JFrame();
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new BorderLayout());
+        JPanel gridPanel = new JPanel(new GridLayout(rows, columns));
 
-        GridLayout layout = new GridLayout(rows, columns);
-        panel.setLayout(layout);
+        //Labels for displaying numbers to the side of each column and row
+        JPanel rowNumbers = new JPanel(new GridLayout(rows, 1));
+        JPanel columnNumbers = new JPanel(new GridLayout(1, columns));
+        
+        //temporary values for numbers that correspond to each row
+        for(int i = 0; i < rows; i++){
+            JLabel label = new JLabel("1");
+            label.setHorizontalAlignment(SwingConstants.RIGHT);
+            rowNumbers.add(label);
+        }
+        //temporary values for numbers that correspond to each column
+        for(int i = 0; i < columns; i++){
+            JLabel label = new JLabel("1");
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            columnNumbers.add(label);
+        }
 
         //initialise each individual square
         squares = new Square[rows][columns];
@@ -23,14 +47,18 @@ public class Nonogram implements ActionListener{
             for(int y = 0; y < columns; y++){
                 squares[x][y] = new Square(x, y);
                 squares[x][y].addActionListener(this);
-                panel.add(squares[x][y]);
+                gridPanel.add(squares[x][y]);
             }
         }
 
+        panel.add(rowNumbers, BorderLayout.WEST);
+        panel.add(columnNumbers, BorderLayout.NORTH);
+        panel.add(gridPanel, BorderLayout.CENTER);
+        
         frame.add(panel);
         frame.setVisible(true);
         frame.setTitle("Nonogram");
-        frame.setSize(475, 400);
+        frame.setSize(600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
