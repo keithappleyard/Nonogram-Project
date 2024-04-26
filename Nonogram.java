@@ -52,13 +52,16 @@ public class Nonogram implements ActionListener{
         }
 
         //button to check puzzle
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton checkButton = new JButton("Submit");
         checkButton.addActionListener(e -> checkPuzzle());
+        buttonPanel.add(checkButton);
 
+        //adding components to main panel
         panel.add(rowNumbers, BorderLayout.WEST);
         panel.add(columnNumbers, BorderLayout.NORTH);
         panel.add(gridPanel, BorderLayout.CENTER);
-        panel.add(checkButton, BorderLayout.SOUTH);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
         
         frame.add(panel);
         frame.setVisible(true);
