@@ -6,6 +6,7 @@ public class Nonogram implements ActionListener{
     int rows;
     int columns;
     Square[][] squares;
+    JFrame frame;
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
@@ -20,7 +21,7 @@ public class Nonogram implements ActionListener{
         //initialise panels and frames
         this.rows = rows;
         this.columns = columns;
-        JFrame frame = new JFrame();
+        frame = new JFrame();
         JPanel panel = new JPanel(new BorderLayout());
         JPanel gridPanel = new JPanel(new GridLayout(rows, columns));
 
@@ -138,13 +139,15 @@ public class Nonogram implements ActionListener{
         //compare each square and return false if any square does not match
         for(int x = 0; x < rows; x++){
             for(int y = 0; y < columns; y++){
-                if(puzzleImage[x][y] != squares[x][y].getCurrentColor())
+                if(puzzleImage[x][y] != squares[x][y].getCurrentColor()){
+                    JOptionPane.showMessageDialog(frame, "Sorry, the solution is incorrect. Try again.");
                     return false;
+                }
             }
         }
 
-        System.out.println("You won!");
-        //return true otherwise
+        //return true otherwise to indicate game is won
+        JOptionPane.showMessageDialog(frame, "You won!");
         return true;
     }
 
