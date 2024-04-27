@@ -28,16 +28,17 @@ public class Nonogram implements ActionListener{
         JPanel rowNumbers = new JPanel(new GridLayout(rows, 1));
         JPanel columnNumbers = new JPanel(new GridLayout(1, columns));
         
-        //temporary values for numbers that correspond to each row
+        //display values for numbers that correspond to each row
         for(int i = 0; i < rows; i++){
-            JLabel label = new JLabel("1");
+            JLabel label = new JLabel(getRowNumbers(i));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
             rowNumbers.add(label);
         }
-        //temporary values for numbers that correspond to each column
+        //display values for numbers that correspond to each column
         for(int i = 0; i < columns; i++){
-            JLabel label = new JLabel("1");
+            JLabel label = new JLabel(getColumnNumbers(i));
             label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setVerticalAlignment(SwingConstants.BOTTOM);
             columnNumbers.add(label);
         }
 
@@ -70,8 +71,66 @@ public class Nonogram implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    //calculate and return string to represent numbers to the side of each row
+    private String getRowNumbers(int rowIndex){
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        boolean needsComma = false;
+        //loop through every element in the row
+        for(int i = 0; i < columns; i++){
+            //increase count if each pixel has consecutive colours
+            if(puzzleImage[rowIndex][i] == 1){
+                count++;
+            }
+            //add current count to list and reset count if colour is different to previous square
+            else if(count > 0){
+                if(needsComma)
+                    sb.append(",");
+                sb.append(count);
+                count = 0;
+                needsComma = true;
+            }
+        }
+        //check for count after for loop ends
+        if(count > 0){
+            if(needsComma)
+                sb.append(",");
+            sb.append(count);
+        }
+        return sb.toString();
+    }
+
+    //calculate and return string to represent numbers above each column
+    private String getColumnNumbers(int columnIndex){
+        StringBuilder sb = new StringBuilder("<html>");
+        int count = 0;
+        boolean needsBreak = false;
+        //loop through every element in the column
+        for(int i = 0; i < rows; i++){
+            //increase count if each pixel has consecutive colours
+            if(puzzleImage[i][columnIndex] == 1){
+                count++;
+            }
+            //add current count to list and reset count if colour is different to previous square
+            else if(count > 0){
+                if(needsBreak)
+                    sb.append("<br>");
+                sb.append(count);
+                count = 0;
+                needsBreak = true;
+            }
+        }
+        //check for count after for loop ends
+        if(count > 0){
+            if(needsBreak)
+                sb.append("<br>");
+            sb.append(count);
+        }
+        return sb.toString();
+    }
+
     //check if colour of each square matches image
-    public boolean checkPuzzle(){
+    private boolean checkPuzzle(){
         //compare number of rows and columns
         if(squares.length != puzzleImage.length || squares[0].length != puzzleImage[0].length)
             return false;
