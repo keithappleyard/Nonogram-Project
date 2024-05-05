@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.nio.file.*;
 
 public class Nonogram implements ActionListener{
     int rows;
@@ -155,5 +157,49 @@ public class Nonogram implements ActionListener{
     public void actionPerformed(ActionEvent e){
         Square square = (Square)e.getSource();
         square.cycleColor();
+    }
+
+    //function to read from windows bmp file
+    private byte[] readFile(String path){
+        byte[] allBytes = null;
+        try{
+            allBytes = Files.readAllBytes(Paths.get(path));
+        } catch (IOException ex){
+            ex.printStackTrace();
+        }
+        return allBytes;
+    }
+
+    //function to load image from file
+    public void loadImage(String path){
+        byte[] imageData = readFile(path);
+        int width = imageData[18];  //add more bytes later to increase maximum image width
+        int height = imageData[22]; //add more bytes later to increase maximum image height
+        int dataLocation = imageData[10]; //add more bytes later
+        int bitsPerPixel = imageData[28]; //add more bytes later and relevant later
+
+        int bytesPerRow = (int)Math.ceil(width / 8);
+        int paddedBytesPerRow = (int)Math.ceil(bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
+        int pixelIndex = dataLocation;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                //find the byte and bit index corresponding to this pixel
+                int byteIndex = x / 8;
+                int bitIndex = 7 - (x % 8);
+
+                //extract the pixel value (0 or 1) to represent the colour
+                int pixelByte = imageData[pixelIndex + byteIndex] & 0xFF; //mask negative part
+                int pixelValue = (pixelByte >> bitIndex) & 0x01; //bit shift and mask every number to either get a value of 1 or 0
+
+                //print where each colour pixel is depending on its pixel value
+                if (pixelValue == 0) {
+                    System.out.println("Black pixel at (" + x + ", " + y + ")");
+                } else {
+                    System.out.println("White pixel at (" + x + ", " + y + ")");
+                }
+            }
+            //move to the next row in the pixel data
+            pixelIndex += paddedBytesPerRow;
+        }
     }
 }
