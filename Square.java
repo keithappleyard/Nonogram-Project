@@ -5,7 +5,7 @@ import java.awt.*;
 public class Square extends JButton{
     private int xPos;
     private int yPos;
-    private Color[] colors = {Color.WHITE, Color.BLACK, Color.LIGHT_GRAY};
+    private Color[] colors = {Color.WHITE, Color.BLACK};
     private int currentColor = 0;
 
     public Square(int xPos, int yPos){
@@ -36,5 +36,11 @@ public class Square extends JButton{
     //function to return value corresponding to current colour of image
     public int getCurrentColor(){
         return currentColor;
+    }
+
+    //function to set colour value
+    public void setColor(int col){
+        currentColor = col;
+        setBackground(colors[currentColor]);
     }
 }
