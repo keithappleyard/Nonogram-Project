@@ -207,7 +207,7 @@ public class Nonogram implements ActionListener{
         int bitsPerPixel = imageData[28]; //add more bytes later and relevant later
 
         int bytesPerRow = (int)Math.ceil(width / 8);
-        int paddedBytesPerRow = (int)Math.ceil(bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
+        int paddedBytesPerRow = (int)Math.ceil((float)bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
         int pixelIndex = dataLocation;
         int[][] newImage = new int[width][height];
         for (int y = 0; y < height; y++) {
@@ -223,7 +223,7 @@ public class Nonogram implements ActionListener{
                 newImage[height - 1 - y][x] = pixelValue;
             }
             //move to the next row in the pixel data
-            pixelIndex += 4; //change to paddedBytesPerRow once it is working
+            pixelIndex += paddedBytesPerRow; //change to paddedBytesPerRow once it is working
         }
         puzzleImage = newImage;
         resetGUI(width, height);

@@ -5,11 +5,11 @@ import java.awt.*;
 public class Square extends JButton{
     private int xPos;
     private int yPos;
-    private Color[] colors = {Color.WHITE, Color.BLACK};
-    private int currentColor = 0;
+    private Color[] colors = {Color.BLACK, Color.WHITE};
+    private int currentColor = 1;
 
     public Square(int xPos, int yPos){
-        setBackground(colors[0]);
+        setBackground(colors[1]);
         this.xPos = xPos;
         this.yPos = yPos;
     }
