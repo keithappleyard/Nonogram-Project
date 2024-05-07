@@ -9,6 +9,8 @@ public class Nonogram implements ActionListener{
     int columns;
     Square[][] squares;
     JFrame frame;
+    JPanel panel;
+    JPanel gridPanel;
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
@@ -19,13 +21,30 @@ public class Nonogram implements ActionListener{
         {0, 1, 1, 1, 0},
     };
 
-    public Nonogram(int rows, int columns){
+    //constructor for loading default hard-coded image
+    public Nonogram(){
         //initialise panels and frames
-        this.rows = rows;
-        this.columns = columns;
+        this.rows = puzzleImage.length;
+        this.columns = puzzleImage[0].length;
         frame = new JFrame();
-        JPanel panel = new JPanel(new BorderLayout());
-        JPanel gridPanel = new JPanel(new GridLayout(rows, columns));
+        panel = new JPanel(new BorderLayout());
+        gridPanel = new JPanel(new GridLayout(rows, columns));
+
+        resetGUI(rows, columns);
+
+        frame.add(panel);
+        frame.setVisible(true);
+        frame.setTitle("Nonogram");
+        frame.setSize(600, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private void resetGUI(int rows, int columns){
+        //remove all current components
+        panel.removeAll();
+        panel.revalidate();
+        gridPanel.removeAll();
+        gridPanel.revalidate();
 
         //Labels for displaying numbers to the side of each column and row
         JPanel rowNumbers = new JPanel(new GridLayout(rows, 1));
@@ -67,11 +86,6 @@ public class Nonogram implements ActionListener{
         panel.add(gridPanel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
         
-        frame.add(panel);
-        frame.setVisible(true);
-        frame.setTitle("Nonogram");
-        frame.setSize(600, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     //calculate and return string to represent numbers to the side of each row
