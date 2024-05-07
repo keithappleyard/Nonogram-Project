@@ -15,11 +15,11 @@ public class Nonogram implements ActionListener{
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
-        {0, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0},
-        {0, 0, 0, 0, 0},
-        {0, 1, 0, 1, 0},
-        {0, 1, 1, 1, 0},
+        {1, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1},
+        {1, 1, 1, 1, 1},
+        {1, 0, 1, 0, 1},
+        {1, 0, 0, 0, 1},
     };
 
     //constructor for loading default hard-coded image
@@ -102,7 +102,7 @@ public class Nonogram implements ActionListener{
         //loop through every element in the row
         for(int i = 0; i < columns; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[rowIndex][i] == 1){
+            if(puzzleImage[rowIndex][i] == 0){
                 count++;
             }
             //add current count to list and reset count if colour is different to previous square
@@ -131,7 +131,7 @@ public class Nonogram implements ActionListener{
         //loop through every element in the column
         for(int i = 0; i < rows; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[i][columnIndex] == 1){
+            if(puzzleImage[i][columnIndex] == 0){
                 count++;
             }
             //add current count to list and reset count if colour is different to previous square
