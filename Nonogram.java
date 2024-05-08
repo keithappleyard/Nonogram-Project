@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
-import java.util.Arrays;
 
 public class Nonogram implements ActionListener{
     int rows;
@@ -49,21 +48,28 @@ public class Nonogram implements ActionListener{
 
         //Labels for displaying numbers to the side of each column and row
         JPanel rowNumbers = new JPanel(new GridLayout(rows, 1));
-        JPanel columnNumbers = new JPanel(new GridLayout(1, columns + 1));
-        
+        JPanel columnNumbers = new JPanel(new BorderLayout());
+
+        //blank label for the corner to align column labels to grid
+        JLabel columnCornerLabel = new JLabel();
+        columnCornerLabel.setPreferredSize(new Dimension(rows * 4, columnCornerLabel.getWidth())); //may need changing
+        columnNumbers.add(columnCornerLabel, BorderLayout.WEST);
+
         //display values for numbers that correspond to each row
         for(int i = 0; i < rows; i++){
             JLabel label = new JLabel(getRowNumbers(i));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
             rowNumbers.add(label);
         }
+
+        JPanel columnLabelsPanel = new JPanel(new GridLayout(1, columns));
         //display values for numbers that correspond to each column
         columnNumbers.add(new JLabel());
         for(int i = 0; i < columns; i++){
             JLabel label = new JLabel(getColumnNumbers(i));
             label.setHorizontalAlignment(SwingConstants.CENTER);
             label.setVerticalAlignment(SwingConstants.BOTTOM);
-            columnNumbers.add(label);
+            columnLabelsPanel.add(label);
         }
 
         //initialise each individual square
@@ -86,6 +92,7 @@ public class Nonogram implements ActionListener{
         buttonPanel.add(solveButton);
 
         //adding components to main panel
+        columnNumbers.add(columnLabelsPanel, BorderLayout.CENTER);
         panel.add(rowNumbers, BorderLayout.WEST);
         panel.add(columnNumbers, BorderLayout.NORTH);
         panel.add(gridPanel, BorderLayout.CENTER);
