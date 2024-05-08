@@ -6,6 +6,7 @@ public class Square extends JButton{
     private int xPos;
     private int yPos;
     private Color[] colors = {Color.BLACK, Color.WHITE};
+    private Color incorrect = Color.YELLOW;
     private int currentColor = 1;
 
     public Square(int xPos, int yPos){
@@ -20,6 +21,10 @@ public class Square extends JButton{
 
     public int getYPos(){
         return yPos;
+    }
+
+    public void highlight(){
+        setBackground(incorrect);
     }
 
     //function to cycle between each color in the array of colors when a button is clicked
