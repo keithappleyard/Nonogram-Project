@@ -3,11 +3,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
-import java.util.Arrays;
 
 public class Nonogram implements ActionListener{
-    int rows;
-    int columns;
+    int width;
+    int height;
     Square[][] squares;
     JFrame frame;
     JPanel panel;
@@ -16,22 +15,22 @@ public class Nonogram implements ActionListener{
     //Hard coded image to solve
     private int[][] puzzleImage = {
         {1, 1, 1, 1, 1},
-        {1, 0, 1, 0, 1},
+        {1, 0, 1, 0, 0},
+        {1, 1, 1, 1, 0},
+        {1, 0, 1, 0, 0},
         {1, 1, 1, 1, 1},
-        {1, 0, 1, 0, 1},
-        {1, 0, 0, 0, 1},
     };
 
     //constructor for loading default hard-coded image
     public Nonogram(){
         //initialise panels and frames
-        this.rows = puzzleImage.length;
-        this.columns = puzzleImage[0].length;
+        this.height = puzzleImage.length;
+        this.width = puzzleImage[0].length;
         frame = new JFrame();
         panel = new JPanel(new BorderLayout());
-        gridPanel = new JPanel(new GridLayout(rows, columns));
+        gridPanel = new JPanel(new GridLayout(height, width));
 
-        resetGUI(rows, columns);
+        resetGUI(puzzleImage);
 
         frame.setVisible(true);
         frame.setTitle("Nonogram");
@@ -39,34 +38,35 @@ public class Nonogram implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private void resetGUI(int rows, int columns){
-        this.rows = rows;
-        this.columns = columns;
+    private void resetGUI(int[][] image){
+        puzzleImage = image;
+        this.height = image[0].length;
+        this.width = image.length;
         //remove all current components
         frame.remove(panel);
         panel = new JPanel(new BorderLayout());
-        gridPanel = new JPanel(new GridLayout(rows, columns));
+        gridPanel = new JPanel(new GridLayout(height, width));
 
         //Labels for displaying numbers to the side of each column and row
-        JPanel rowNumbers = new JPanel(new GridLayout(rows, 1));
+        JPanel rowNumbers = new JPanel(new GridLayout(height, 1));
         JPanel columnNumbers = new JPanel(new BorderLayout());
 
         //blank label for the corner to align column labels to grid
         JLabel columnCornerLabel = new JLabel();
-        columnCornerLabel.setPreferredSize(new Dimension((int)(rows * 2.5), columnCornerLabel.getWidth())); //may need changing
+        columnCornerLabel.setPreferredSize(new Dimension((int)(height * 2.5), columnCornerLabel.getWidth())); //may need changing
         columnNumbers.add(columnCornerLabel, BorderLayout.WEST);
 
         //display values for numbers that correspond to each row
-        for(int i = 0; i < rows; i++){
+        for(int i = 0; i < height; i++){
             JLabel label = new JLabel(getRowNumbers(i));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
             rowNumbers.add(label);
         }
 
-        JPanel columnLabelsPanel = new JPanel(new GridLayout(1, columns));
+        JPanel columnLabelsPanel = new JPanel(new GridLayout(1, width));
         //display values for numbers that correspond to each column
         columnNumbers.add(new JLabel());
-        for(int i = 0; i < columns; i++){
+        for(int i = 0; i < width; i++){
             JLabel label = new JLabel(getColumnNumbers(i));
             label.setHorizontalAlignment(SwingConstants.CENTER);
             label.setVerticalAlignment(SwingConstants.BOTTOM);
@@ -74,9 +74,9 @@ public class Nonogram implements ActionListener{
         }
 
         //initialise each individual square
-        squares = new Square[rows][columns];
-        for(int y = 0; y < rows; y++){
-            for(int x = 0; x < columns; x++){
+        squares = new Square[width][height];
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
                 squares[x][y] = new Square(x, y);
                 squares[x][y].addActionListener(this);
                 gridPanel.add(squares[x][y]);
@@ -108,7 +108,7 @@ public class Nonogram implements ActionListener{
         int count = 0;
         boolean needsComma = false;
         //loop through every element in the row
-        for(int i = 0; i < columns; i++){
+        for(int i = 0; i < width; i++){
             //increase count if each pixel has consecutive colours
             if(puzzleImage[i][rowIndex] == 0){
                 count++;
@@ -137,7 +137,7 @@ public class Nonogram implements ActionListener{
         int count = 0;
         boolean needsBreak = false;
         //loop through every element in the column
-        for(int i = 0; i < rows; i++){
+        for(int i = 0; i < height; i++){
             //increase count if each pixel has consecutive colours
             if(puzzleImage[columnIndex][i] == 0){
                 count++;
@@ -162,13 +162,13 @@ public class Nonogram implements ActionListener{
 
     //check if colour of each square matches image
     private boolean checkPuzzle(){
-        //compare number of rows and columns
+        //compare number of height and width
         if(squares.length != puzzleImage.length || squares[0].length != puzzleImage[0].length)
             return false;
 
         //compare each square and return false if any square does not match
-        for(int x = 0; x < rows; x++){
-            for(int y = 0; y < columns; y++){
+        for(int x = 0; x < height; x++){
+            for(int y = 0; y < width; y++){
                 if(puzzleImage[x][y] != squares[x][y].getCurrentColor()){
                     showIncorrectColors();
                     JOptionPane.showMessageDialog(frame, "Sorry, the solution is incorrect. Try again.");
@@ -184,17 +184,18 @@ public class Nonogram implements ActionListener{
 
     //function to highlight incorrect squares
     private void showIncorrectColors(){
-        for(int y = 0; y < columns; y++){
-            for(int x = 0; x < rows; x++){
+        for(int y = 0; y < width; y++){
+            for(int x = 0; x < height; x++){
                 if(squares[x][y].getCurrentColor() != puzzleImage[x][y])
                     squares[x][y].highlight();
             }
         }
     }
 
+    //function to reveal each square
     public void showPuzzle(){
-        for(int y = 0; y < columns; y++){
-            for(int x = 0; x < rows; x++){
+        for(int y = 0; y < width; y++){
+            for(int x = 0; x < height; x++){
                 squares[x][y].setColor(puzzleImage[x][y]);
             }
         }
@@ -220,32 +221,31 @@ public class Nonogram implements ActionListener{
     //function to load image from file
     public void loadImage(String path){
         byte[] imageData = readFile(path);
-        int width = imageData[18];  //add more bytes later to increase maximum image width
-        int height = imageData[22]; //add more bytes later to increase maximum image height
+        int newWidth = imageData[18];  //add more bytes later to increase maximum image width
+        int newHeight = imageData[22]; //add more bytes later to increase maximum image height
         int dataLocation = imageData[10]; //add more bytes later
         int bitsPerPixel = imageData[28]; //add more bytes later and relevant later
-
-        int bytesPerRow = (int)Math.ceil(width * bitsPerPixel / 8);
+;
+        int bytesPerRow = (int)Math.ceil(newWidth * bitsPerPixel / 8);
         int paddedBytesPerRow = (int)Math.ceil((float)bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
         int pixelIndex = dataLocation;
-        int[][] newImage = new int[width][height];
-        for (int y = height - 1; y >= 0; y--) {
-            for (int x = 0; x < width; x++) {
+        int[][] newImage = new int[newWidth][newHeight];
+        for (int y = newHeight - 1; y >= 0; y--) {
+            for (int x = 0; x < newWidth; x++) {
                 //find the byte and bit index corresponding to this pixel
-                int byteIndex = x / 8;
-                int bitIndex = 7 - (x % 8);
+                int byteIndex = x * bitsPerPixel / 8;
+                int bitShift = (8 - ((x * bitsPerPixel) % 8) - bitsPerPixel) % 8;
 
                 //extract the pixel value (0 or 1) to represent the colour
                 int pixelByte = imageData[pixelIndex + byteIndex] & 0xFF; //mask negative part
-                int pixelValue = (pixelByte >> bitIndex) & 0x01; //bit shift and mask every number to either get a value of 1 or 0
+                int pixelValue = (pixelByte >> bitShift) & ((1 << bitsPerPixel) - 1); //bit shift and mask every number to either get a value of 1 or 0
 
                 newImage[x][y] = pixelValue;
             }
             //move to the next row in the pixel data
             pixelIndex += paddedBytesPerRow;
         }
-        //System.out.println(Arrays.deepToString(newImage));
-        puzzleImage = newImage;
-        resetGUI(width, height);
+        //puzzleImage = newImage;
+        resetGUI(newImage);
     }
 }
