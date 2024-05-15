@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.*;
+import java.util.ArrayList;
 
 public class Nonogram implements ActionListener{
     int width;
@@ -11,6 +12,7 @@ public class Nonogram implements ActionListener{
     JFrame frame;
     JPanel panel;
     JPanel gridPanel;
+    ArrayList<Color> colors = new ArrayList<Color>();
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
@@ -30,6 +32,8 @@ public class Nonogram implements ActionListener{
         panel = new JPanel(new BorderLayout());
         gridPanel = new JPanel(new GridLayout(height, width));
 
+        colors.add(Color.WHITE);
+        colors.add(Color.BLACK);
         resetGUI(puzzleImage);
 
         frame.setVisible(true);
@@ -77,7 +81,7 @@ public class Nonogram implements ActionListener{
         squares = new Square[width][height];
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                squares[x][y] = new Square(x, y);
+                squares[x][y] = new Square(colors);
                 squares[x][y].addActionListener(this);
                 gridPanel.add(squares[x][y]);
             }
@@ -110,7 +114,7 @@ public class Nonogram implements ActionListener{
         //loop through every element in the row
         for(int i = 0; i < width; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[i][rowIndex] == 0){
+            if(puzzleImage[i][rowIndex] == Color.BLACK.getRGB()){
                 count++;
             }
             //add current count to list and reset count if colour is different to previous square
@@ -139,7 +143,7 @@ public class Nonogram implements ActionListener{
         //loop through every element in the column
         for(int i = 0; i < height; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[columnIndex][i] == 0){
+            if(puzzleImage[columnIndex][i] == Color.BLACK.getRGB()){
                 count++;
             }
             //add current count to list and reset count if colour is different to previous square
@@ -167,9 +171,9 @@ public class Nonogram implements ActionListener{
             return false;
 
         //compare each square and return false if any square does not match
-        for(int x = 0; x < height; x++){
-            for(int y = 0; y < width; y++){
-                if(puzzleImage[x][y] != squares[x][y].getCurrentColor()){
+        for(int x = 0; x < width; x++){
+            for(int y = 0; y < height; y++){
+                if(squares[x][y].getCurrentColor().getRGB() != puzzleImage[x][y]){
                     showIncorrectColors();
                     JOptionPane.showMessageDialog(frame, "Sorry, the solution is incorrect. Try again.");
                     return false;
@@ -184,9 +188,9 @@ public class Nonogram implements ActionListener{
 
     //function to highlight incorrect squares
     private void showIncorrectColors(){
-        for(int y = 0; y < width; y++){
-            for(int x = 0; x < height; x++){
-                if(squares[x][y].getCurrentColor() != puzzleImage[x][y])
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                if(squares[x][y].getCurrentColor().getRGB() != new Color(puzzleImage[x][y]).getRGB())
                     squares[x][y].highlight();
             }
         }
@@ -194,9 +198,10 @@ public class Nonogram implements ActionListener{
 
     //function to reveal each square
     public void showPuzzle(){
-        for(int y = 0; y < width; y++){
-            for(int x = 0; x < height; x++){
-                squares[x][y].setColor(puzzleImage[x][y]);
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                Color col = new Color(puzzleImage[x][y]);
+                squares[x][y].setColor(col);
             }
         }
     }
@@ -230,17 +235,20 @@ public class Nonogram implements ActionListener{
         int paddedBytesPerRow = (int)Math.ceil((float)bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
         int pixelIndex = dataLocation;
         int[][] newImage = new int[newWidth][newHeight];
+        colors = new ArrayList<Color>();
         for (int y = newHeight - 1; y >= 0; y--) {
             for (int x = 0; x < newWidth; x++) {
-                //find the byte and bit index corresponding to this pixel
-                int byteIndex = x * bitsPerPixel / 8;
-                int bitShift = (8 - ((x * bitsPerPixel) % 8) - bitsPerPixel) % 8;
+                //extract rgb values for each pixel, also need to add support for different bit images
+                int blue = imageData[pixelIndex + x * 3] & 0xFF;
+                int green = imageData[pixelIndex + x * 3 + 1] & 0xFF;
+                int red = imageData[pixelIndex + x * 3 + 2] & 0xFF;
 
-                //extract the pixel value (0 or 1) to represent the colour
-                int pixelByte = imageData[pixelIndex + byteIndex] & 0xFF; //mask negative part
-                int pixelValue = (pixelByte >> bitShift) & ((1 << bitsPerPixel) - 1); //bit shift and mask every number to either get a value of 1 or 0
-
-                newImage[x][y] = pixelValue;
+                //add colour to colour palette if it hasn't already been added
+                Color color = new Color(red, green, blue);
+                if (!colors.contains(color)) {
+                    colors.add(color);
+                }
+                newImage[x][y] = color.getRGB();
             }
             //move to the next row in the pixel data
             pixelIndex += paddedBytesPerRow;
