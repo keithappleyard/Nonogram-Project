@@ -60,7 +60,6 @@ public class Nonogram implements ActionListener{
             JLabel label = new JLabel(getRowNumbers(i));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
             rowNumbers.add(label);
-
         }
 
         //blank label for the corner to align column labels to grid
