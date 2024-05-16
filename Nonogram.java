@@ -18,11 +18,11 @@ public class Nonogram implements ActionListener{
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
-        {1, 1, 1, 1, 1},
-        {1, 0, 1, 0, 0},
-        {1, 1, 1, 1, 0},
-        {1, 0, 1, 0, 0},
-        {1, 1, 1, 1, 1},
+        {Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB()},
+        {Color.WHITE.getRGB(), Color.BLACK.getRGB(), Color.WHITE.getRGB(), Color.BLACK.getRGB(), Color.BLACK.getRGB()},
+        {Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.BLACK.getRGB()},
+        {Color.WHITE.getRGB(), Color.BLACK.getRGB(), Color.WHITE.getRGB(), Color.BLACK.getRGB(), Color.BLACK.getRGB()},
+        {Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB(), Color.WHITE.getRGB()},
     };
 
     //constructor for loading default hard-coded image
@@ -273,11 +273,10 @@ public class Nonogram implements ActionListener{
     //function to load image from file
     public void loadImage(String path){
         byte[] imageData = readFile(path);
-        int newWidth = imageData[18];  //add more bytes later to increase maximum image width
-        int newHeight = imageData[22]; //add more bytes later to increase maximum image height
-        int dataLocation = imageData[10]; //add more bytes later
-        int bitsPerPixel = imageData[28]; //add more bytes later and relevant later
-;
+        int newWidth = (imageData[18] & 0xFF) | ((imageData[19] << 8) & 0xFF);
+        int newHeight = (imageData[22] & 0xFF) | ((imageData[23] << 8) & 0xFF);
+        int dataLocation = (imageData[10] & 0xFF) | ((imageData[11] << 8) & 0xFF);
+        int bitsPerPixel = imageData[28] & 0xFF;
         int bytesPerRow = (int)Math.ceil(newWidth * bitsPerPixel / 8);
         int paddedBytesPerRow = (int)Math.ceil((float)bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
         int pixelIndex = dataLocation;
@@ -285,17 +284,36 @@ public class Nonogram implements ActionListener{
         colors = new ArrayList<Color>();
         for (int y = newHeight - 1; y >= 0; y--) {
             for (int x = 0; x < newWidth; x++) {
-                //extract rgb values for each pixel, also need to add support for different bit images
-                int blue = imageData[pixelIndex + x * (bitsPerPixel / 8)] & 0xFF;
-                int green = imageData[pixelIndex + x * (bitsPerPixel / 8) + 1] & 0xFF;
-                int red = imageData[pixelIndex + x * (bitsPerPixel / 8) + 2] & 0xFF;
-
-                //add colour to colour palette if it hasn't already been added
-                Color color = new Color(red, green, blue);
-                if (!colors.contains(color)) {
-                    colors.add(color);
+                int blue = 255;
+                int green = 255;
+                int red = 255;
+                //handle separate cases for different bits per pixel
+                switch(bitsPerPixel){
+                    case 1:
+                        //find the byte and bit index corresponding to this pixel
+                        int byteIndex = x * bitsPerPixel / 8;
+                        int bitShift = (8 - ((x * bitsPerPixel) % 8) - bitsPerPixel) % 8;
+                        int pixelByte = imageData[pixelIndex + byteIndex] & 0xFF;
+                        int pixelData = (pixelByte >> bitShift) & ((1 << bitsPerPixel) - 1);
+                        red = green = blue = pixelData * 255;
+                        break;
+                    //treat 24 and 32 bits per pixel the same way (ignore alpha values)
+                    case 24: case 32:
+                        //extract rgb values for each pixel, also need to add support for different bit images
+                        blue = imageData[pixelIndex + x * (bitsPerPixel / 8)] & 0xFF;
+                        green = imageData[pixelIndex + x * (bitsPerPixel / 8) + 1] & 0xFF;
+                        red = imageData[pixelIndex + x * (bitsPerPixel / 8) + 2] & 0xFF;
+                        break;
+                    default:
+                        //throw exception if unsupported bits per pixel case was found
+                        throw new IllegalArgumentException("Unsupported bits per pixel: " + bitsPerPixel);
                 }
-                newImage[x][y] = color.getRGB();
+                //add colour to colour palette if it hasn't already been added
+                Color col = new Color(red, green, blue);
+                if (!colors.contains(col)) {
+                    colors.add(col);
+                }
+                newImage[x][y] = col.getRGB();
             }
             //move to the next row in the pixel data
             pixelIndex += paddedBytesPerRow;
