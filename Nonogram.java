@@ -108,29 +108,45 @@ public class Nonogram implements ActionListener{
 
     //calculate and return string to represent numbers to the side of each row
     private String getRowNumbers(int rowIndex){
-        StringBuilder sb = new StringBuilder();
-        int count = 0;
+        StringBuilder sb = new StringBuilder("<html>");
+        int count = 1;
         boolean needsComma = false;
+        Color col = new Color(puzzleImage[0][rowIndex]);
+
         //loop through every element in the row
-        for(int i = 0; i < width; i++){
+        for(int i = 1; i < width; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[i][rowIndex] == Color.BLACK.getRGB()){
+            if(puzzleImage[i][rowIndex] == col.getRGB()){
                 count++;
             }
-            //add current count to list and reset count if colour is different to previous square
-            else if(count > 0){
-                if(needsComma)
-                    sb.append(",");
-                sb.append(count);
-                count = 0;
-                needsComma = true;
+            //otherwise add current count to list and reset count if colour is different to previous square
+            else{
+                //ignore if square is white
+                if(col.getRGB() != Color.WHITE.getRGB()){
+                    if(needsComma)
+                        sb.append(",");
+                    sb.append("<span style='color: rgb(")
+                    .append(col.getRed()).append(", ")
+                    .append(col.getGreen()).append(", ")
+                    .append(col.getBlue()).append(");'>")
+                    .append(count)
+                    .append("</span>");
+                    needsComma = true;
+                }
+                count = 1;
+                col = new Color(puzzleImage[i][rowIndex]);
             }
         }
-        //check for count after for loop ends
-        if(count > 0){
+        //check for count after for loop ends and ignore if squares are white
+        if(count > 0 & col.getRGB() != Color.WHITE.getRGB()){
             if(needsComma)
                 sb.append(",");
-            sb.append(count);
+            sb.append("<span style='color: rgb(")
+            .append(col.getRed()).append(", ")
+            .append(col.getGreen()).append(", ")
+            .append(col.getBlue()).append(");'>")
+            .append(count)
+            .append("</span>");
         }
         return sb.toString();
     }
@@ -138,28 +154,43 @@ public class Nonogram implements ActionListener{
     //calculate and return string to represent numbers above each column
     private String getColumnNumbers(int columnIndex){
         StringBuilder sb = new StringBuilder("<html>");
-        int count = 0;
+        int count = 1;
         boolean needsBreak = false;
+        Color col = new Color(puzzleImage[columnIndex][0]);
+
         //loop through every element in the column
-        for(int i = 0; i < height; i++){
+        for(int i = 1; i < height; i++){
             //increase count if each pixel has consecutive colours
-            if(puzzleImage[columnIndex][i] == Color.BLACK.getRGB()){
+            if(puzzleImage[columnIndex][i] == col.getRGB()){
                 count++;
             }
-            //add current count to list and reset count if colour is different to previous square
-            else if(count > 0){
-                if(needsBreak)
-                    sb.append("<br>");
-                sb.append(count);
-                count = 0;
-                needsBreak = true;
+            //otherwise add current count to list and reset count if colour is different to previous square
+            else{
+                if(col.getRGB() != Color.WHITE.getRGB()){
+                    if(needsBreak)
+                        sb.append("<br>");
+                    sb.append("<span style='color: rgb(")
+                    .append(col.getRed()).append(", ")
+                    .append(col.getGreen()).append(", ")
+                    .append(col.getBlue()).append(");'>")
+                    .append(count)
+                    .append("</span>");
+                    needsBreak = true;
+                }
+                count = 1;
+                col = new Color(puzzleImage[columnIndex][i]);
             }
         }
-        //check for count after for loop ends
-        if(count > 0){
+        //check for count after for loop ends and ignore if the squares are white
+        if(count > 0 & col.getRGB() != Color.WHITE.getRGB()){
             if(needsBreak)
                 sb.append("<br>");
-            sb.append(count);
+            sb.append("<span style='color: rgb(")
+            .append(col.getRed()).append(", ")
+            .append(col.getGreen()).append(", ")
+            .append(col.getBlue()).append(");'>")
+            .append(count)
+            .append("</span>");
         }
         return sb.toString();
     }
@@ -239,9 +270,9 @@ public class Nonogram implements ActionListener{
         for (int y = newHeight - 1; y >= 0; y--) {
             for (int x = 0; x < newWidth; x++) {
                 //extract rgb values for each pixel, also need to add support for different bit images
-                int blue = imageData[pixelIndex + x * 3] & 0xFF;
-                int green = imageData[pixelIndex + x * 3 + 1] & 0xFF;
-                int red = imageData[pixelIndex + x * 3 + 2] & 0xFF;
+                int blue = imageData[pixelIndex + x * (bitsPerPixel / 8)] & 0xFF;
+                int green = imageData[pixelIndex + x * (bitsPerPixel / 8) + 1] & 0xFF;
+                int red = imageData[pixelIndex + x * (bitsPerPixel / 8) + 2] & 0xFF;
 
                 //add colour to colour palette if it hasn't already been added
                 Color color = new Color(red, green, blue);
@@ -253,7 +284,6 @@ public class Nonogram implements ActionListener{
             //move to the next row in the pixel data
             pixelIndex += paddedBytesPerRow;
         }
-        //puzzleImage = newImage;
         resetGUI(newImage);
     }
 }
