@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -87,12 +89,14 @@ public class Nonogram implements ActionListener{
             }
         }
 
-        //button to check puzzle
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton checkButton = new JButton("Submit");
-        JButton solveButton = new JButton("Solve");
+        JButton chooseButton = new JButton("Load");     //button to load new puzzle
+        JButton checkButton = new JButton("Submit");    //button to check puzzle
+        JButton solveButton = new JButton("Solve");     //button to solve the puzzle
+        chooseButton.addActionListener(e -> pickFile());
         checkButton.addActionListener(e -> checkPuzzle());
         solveButton.addActionListener(e -> showPuzzle());
+        buttonPanel.add(chooseButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(solveButton);
 
@@ -241,6 +245,18 @@ public class Nonogram implements ActionListener{
     public void actionPerformed(ActionEvent e){
         Square square = (Square)e.getSource();
         square.cycleColor();
+    }
+
+    //function to pick new file
+    private void pickFile(){
+        JFileChooser chooser = new JFileChooser();
+        File current = new File(System.getProperty("user.dir"));
+        chooser.setCurrentDirectory(current);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Windows BMP File","bmp");
+        chooser.setFileFilter(filter);
+        int returnVal = chooser.showOpenDialog(null);
+        if(returnVal == JFileChooser.APPROVE_OPTION)
+            loadImage(chooser.getSelectedFile().getAbsolutePath());
     }
 
     //function to read from windows bmp file
