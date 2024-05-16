@@ -54,18 +54,19 @@ public class Nonogram implements ActionListener{
         //Labels for displaying numbers to the side of each column and row
         JPanel rowNumbers = new JPanel(new GridLayout(height, 1));
         JPanel columnNumbers = new JPanel(new BorderLayout());
-
-        //blank label for the corner to align column labels to grid
-        JLabel columnCornerLabel = new JLabel();
-        columnCornerLabel.setPreferredSize(new Dimension((int)(height * 2.5), columnCornerLabel.getWidth())); //may need changing
-        columnNumbers.add(columnCornerLabel, BorderLayout.WEST);
-
+        
         //display values for numbers that correspond to each row
         for(int i = 0; i < height; i++){
             JLabel label = new JLabel(getRowNumbers(i));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
             rowNumbers.add(label);
+
         }
+
+        //blank label for the corner to align column labels to grid
+        JLabel columnCornerLabel = new JLabel();
+        columnCornerLabel.setPreferredSize(new Dimension(rowNumbers.getPreferredSize().width, columnCornerLabel.getHeight()));
+        columnNumbers.add(columnCornerLabel, BorderLayout.WEST);
 
         JPanel columnLabelsPanel = new JPanel(new GridLayout(1, width));
         //display values for numbers that correspond to each column
