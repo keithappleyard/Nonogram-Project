@@ -1,11 +1,8 @@
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.nio.file.*;
-import java.util.ArrayList;
 
 public class Nonogram implements ActionListener{
     int width;
@@ -14,7 +11,7 @@ public class Nonogram implements ActionListener{
     JFrame frame;
     JPanel panel;
     JPanel gridPanel;
-    ArrayList<Color> colors = new ArrayList<Color>();
+    Color[] colors = new Color[2];
 
     //Hard coded image to solve
     private int[][] puzzleImage = {
@@ -34,13 +31,13 @@ public class Nonogram implements ActionListener{
         panel = new JPanel(new BorderLayout());
         gridPanel = new JPanel(new GridLayout(height, width));
 
-        colors.add(Color.WHITE);
-        colors.add(Color.BLACK);
+        colors[0] = Color.WHITE;
+        colors[1] = Color.BLACK;
         resetGUI(puzzleImage);
 
         frame.setVisible(true);
         frame.setTitle("Nonogram");
-        frame.setSize(600, 600);
+        frame.setSize(800, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -89,16 +86,20 @@ public class Nonogram implements ActionListener{
             }
         }
 
+        //add buttons to screen
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton chooseButton = new JButton("Load");     //button to load new puzzle
         JButton checkButton = new JButton("Submit");    //button to check puzzle
         JButton solveButton = new JButton("Solve");     //button to solve the puzzle
+        JButton resetButton = new JButton("Reset");      //button to reset puzzle
         chooseButton.addActionListener(e -> pickFile());
         checkButton.addActionListener(e -> checkPuzzle());
         solveButton.addActionListener(e -> showPuzzle());
+        resetButton.addActionListener(e -> resetGUI(puzzleImage));
         buttonPanel.add(chooseButton);
         buttonPanel.add(checkButton);
         buttonPanel.add(solveButton);
+        buttonPanel.add(resetButton);
 
         //adding components to main panel
         columnNumbers.add(columnLabelsPanel, BorderLayout.CENTER);
@@ -259,65 +260,11 @@ public class Nonogram implements ActionListener{
             loadImage(chooser.getSelectedFile().getAbsolutePath());
     }
 
-    //function to read from windows bmp file
-    private byte[] readFile(String path){
-        byte[] allBytes = null;
-        try{
-            allBytes = Files.readAllBytes(Paths.get(path));
-        } catch (IOException ex){
-            ex.printStackTrace();
-        }
-        return allBytes;
-    }
-
     //function to load image from file
-    public void loadImage(String path){
-        byte[] imageData = readFile(path);
-        int newWidth = (imageData[18] & 0xFF) | ((imageData[19] << 8) & 0xFF);
-        int newHeight = (imageData[22] & 0xFF) | ((imageData[23] << 8) & 0xFF);
-        int dataLocation = (imageData[10] & 0xFF) | ((imageData[11] << 8) & 0xFF);
-        int bitsPerPixel = imageData[28] & 0xFF;
-        int bytesPerRow = (int)Math.ceil(newWidth * bitsPerPixel / 8);
-        int paddedBytesPerRow = (int)Math.ceil((float)bytesPerRow/4) * 4; //account for extra zeros after the row has been represented
-        int pixelIndex = dataLocation;
-        int[][] newImage = new int[newWidth][newHeight];
-        colors = new ArrayList<Color>();
-        for (int y = newHeight - 1; y >= 0; y--) {
-            for (int x = 0; x < newWidth; x++) {
-                int blue = 255;
-                int green = 255;
-                int red = 255;
-                //handle separate cases for different bits per pixel
-                switch(bitsPerPixel){
-                    case 1:
-                        //find the byte and bit index corresponding to this pixel
-                        int byteIndex = x * bitsPerPixel / 8;
-                        int bitShift = (8 - ((x * bitsPerPixel) % 8) - bitsPerPixel) % 8;
-                        int pixelByte = imageData[pixelIndex + byteIndex] & 0xFF;
-                        int pixelData = (pixelByte >> bitShift) & ((1 << bitsPerPixel) - 1);
-                        red = green = blue = pixelData * 255;
-                        break;
-                    //treat 24 and 32 bits per pixel the same way (ignore alpha values)
-                    case 24: case 32:
-                        //extract rgb values for each pixel, also need to add support for different bit images
-                        blue = imageData[pixelIndex + x * (bitsPerPixel / 8)] & 0xFF;
-                        green = imageData[pixelIndex + x * (bitsPerPixel / 8) + 1] & 0xFF;
-                        red = imageData[pixelIndex + x * (bitsPerPixel / 8) + 2] & 0xFF;
-                        break;
-                    default:
-                        //throw exception if unsupported bits per pixel case was found
-                        throw new IllegalArgumentException("Unsupported bits per pixel: " + bitsPerPixel);
-                }
-                //add colour to colour palette if it hasn't already been added
-                Color col = new Color(red, green, blue);
-                if (!colors.contains(col)) {
-                    colors.add(col);
-                }
-                newImage[x][y] = col.getRGB();
-            }
-            //move to the next row in the pixel data
-            pixelIndex += paddedBytesPerRow;
-        }
+    private void loadImage(String path){
+        BMPLoader loader = new BMPLoader();
+        int[][] newImage = loader.loadImage(path);
+        colors = loader.getColors();
         resetGUI(newImage);
     }
 }
