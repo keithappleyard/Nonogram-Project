@@ -41,6 +41,7 @@ public class Nonogram implements ActionListener{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
+    //function to set the GUI to match the imported image
     private void resetGUI(int[][] image){
         puzzleImage = image;
         this.height = image[0].length;
@@ -233,7 +234,7 @@ public class Nonogram implements ActionListener{
     }
 
     //function to reveal each square
-    public void showPuzzle(){
+    private void showPuzzle(){
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
                 Color col = new Color(puzzleImage[x][y]);
@@ -242,7 +243,7 @@ public class Nonogram implements ActionListener{
         }
     }
 
-    //called when a button is pressed
+    //called when a square is pressed
     public void actionPerformed(ActionEvent e){
         Square square = (Square)e.getSource();
         square.cycleColor();

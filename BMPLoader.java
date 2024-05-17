@@ -9,6 +9,7 @@ public class BMPLoader {
     //function to read from windows bmp file
     List<Color> colors = new ArrayList<Color>();
 
+    //function to return byte array of loaded image
     private byte[] readFile(String path){
         byte[] allBytes = null;
         try{
@@ -24,7 +25,7 @@ public class BMPLoader {
         return colors.toArray(new Color[colors.size()]);
     }
 
-    //function to load image from file
+    //function to load image from file and return integer array for rgb value of each pixel
     public int[][] loadImage(String path){
         byte[] imageData = readFile(path);
         //extracting image header data

@@ -1,6 +1,6 @@
 public class Game {
     public static void main(String[] args){
+        //new instance of Nonogram class
         Nonogram puzzle = new Nonogram();
-        //puzzle.loadImage("bmp-files/summer-project/2colour_elephant.bmp");
     }
 }
