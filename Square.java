@@ -3,13 +3,11 @@ import java.awt.*;
 
 //class to represent each square in the nonogram
 public class Square extends JButton{
-    private Color[] colors;
     private Color incorrect = Color.YELLOW;
     private int currentColor = 0;
 
-    public Square(Color[] colors){
+    public Square(){
         setBackground(Color.WHITE);
-        this.colors = colors;
     }
 
     public void highlight(){
@@ -17,7 +15,7 @@ public class Square extends JButton{
     }
 
     //function to cycle between each color in the array of colors when a button is clicked
-    public void cycleColor(){
+    public void cycleColor(Color[] colors){
         if(currentColor < colors.length - 1){
             currentColor++;
         }

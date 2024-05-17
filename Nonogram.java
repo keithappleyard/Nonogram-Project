@@ -81,7 +81,7 @@ public class Nonogram implements ActionListener{
         squares = new Square[width][height];
         for(int y = 0; y < height; y++){
             for(int x = 0; x < width; x++){
-                squares[x][y] = new Square(colors);
+                squares[x][y] = new Square();
                 squares[x][y].addActionListener(this);
                 gridPanel.add(squares[x][y]);
             }
@@ -246,7 +246,7 @@ public class Nonogram implements ActionListener{
     //called when a square is pressed
     public void actionPerformed(ActionEvent e){
         Square square = (Square)e.getSource();
-        square.cycleColor();
+        square.cycleColor(colors);
     }
 
     //function to pick new file
